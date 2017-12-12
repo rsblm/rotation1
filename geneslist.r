@@ -18,5 +18,5 @@ regionlist <- function (plus, minus, pos_strand="//biochstore4.bioch.ox.ac.uk/Me
   return(promoter_region)
 }
 
-promoter_region <- regionlist(1000,250)
+
 
