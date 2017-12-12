@@ -1,0 +1,117 @@
+---
+title: "genomation"
+output: html_notebook
+---
+
+```{r}
+source("https://bioconductor.org/biocLite.R")
+biocLite("genomation")
+
+library("grid")
+library("genomation")
+library("rtracklayer")
+library("GenomicRanges")
+```
+
+Constructing genomic intervals of interest
+```{r}
+#Genes according to Steinmetz lab Pechano et al. 2013
+setwd("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa")
+genes_plus <- read.table("pos_strand_annotations.bed")
+genes_minus <- read.table("neg_strand_annotations.bed")
+all_genes <- rbind(genes_plus, genes_minus)
+
+
+#Promoter proximal (from -400 TSS to +400 TSS)
+promoter_region <- all_genes[]
+promoter_region[,3] <- all_genes[,2]+400
+promoter_region[,2] <- all_genes[,2]-400
+save(promoter_region, file="promoter_region.bed")
+
+```
+
+
+
+Data import
+```{r}
+filesbw <- dir("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", pattern = glob2rx("fischl*.bw"), full.names=TRUE)
+#names(filesbw) <- file.path.sans.ext(filesbw)
+names(filesbw) <- gsub('//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa', '', filesbw)
+
+
+test_bw <- import.bw(filesbw[1])
+
+
+  if (any(grep("plus", names(filesbw[1])))) {
+  strand(test_bw) <- "+"
+  } else {
+    if (any(grep("minus", names(filesbw[1])))) {
+    strand(test_bw) <- "-"
+    }else{
+  print("no strand specified")
+  }
+  }
+  
+```
+
+
+Make a matrix with the bins for every gene
+```{r}
+rangelength <- promoter_region[1,3]-promoter_region[1,2]
+
+#specify binsize in bp
+binsize <- 40
+numberbin <- rangelength/binsize
+bin_matrix <- as.data.frame(matrix(nrow=(nrow(promoter_region)*numberbin), ncol=6))
+colnames(bin_matrix) <- c("gene", "bin#", "chr", "start", "end", "strand")
+
+bin_matrix[,1] <- rep(promoter_region[,4], each=numberbin)
+bin_matrix[,2] <- rep(seq(1, numberbin), times=nrow(promoter_region))
+bin_matrix[,3] <- rep(promoter_region[,1], each=numberbin)
+bin_matrix[,6] <- rep(promoter_region[,6], each=numberbin)
+
+
+bin_matrix[,4] <- rep(promoter_region[,2], each=numberbin)
+bin_matrix[,4] <- bin_matrix[,4]+(binsize*(bin_matrix[,2]-1))
+
+
+bin_matrix[,5] <- (bin_matrix[,4]+(binsize-1))
+
+
+bin_grange <- makeGRangesFromDataFrame(bin_matrix, seqnames.field = "chr", start.field = "start", end.field = "end", keep.extra.columns = TRUE)
+# Now bins are not overlapping (so have a  size of binsize in GRanges object) and the last bp in the promoter region is lost...
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+f <- function(x) length( intersect(seq(x[1],x[2],1), seq(x[3],x[4],1)) )
+
+a <- apply(X,1,f)
+
+
+
+
+
+
+```
+
+
+
+
