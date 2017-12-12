@@ -26,4 +26,7 @@ bin_matrix[,5] <- (bin_matrix[,4]+(binsize-1))
 
 
 bin_grange <- makeGRangesFromDataFrame(bin_matrix, seqnames.field = "chr", start.field = "start", end.field = "end", keep.extra.columns = TRUE)
+
+res2 <- list(bin_grange=bin_grange, bin_matrix=bin_matrix, numberbin=numberbin) 
+return(res2)
 }
