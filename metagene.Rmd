@@ -1,0 +1,55 @@
+---
+title: "Metagene"
+output: html_notebook
+---
+
+```{r}
+source("https://bioconductor.org/biocLite.R")
+biocLite("metagene")
+biocLite("gdata")
+biocLite("Rsamtools")
+library("rtracklayer")
+library("metagene")
+library("Rsamtools")
+
+```
+
+Inputs
+
+```{r}
+#alignment files
+
+filesbw <- dir("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", pattern = glob2rx("fischl*.bw"), full.names=TRUE)
+
+
+```
+
+```{r}
+#Genomic regions
+setwd("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa")
+genes_plus <- read.table("pos_strand_annotations.bed")
+genes_minus <- read.table("neg_strand_annotations.bed")
+all_genes <- rbind(genes_plus, genes_minus)
+
+
+```
+
+
+
+```{r}
+#Design groups
+
+```
+
+
+```{r}
+mg <- metagene$new(regions=all_genes, bam_files=filesbw, assay = "rnaseq", paired_end=FALSE)
+
+
+
+```
+
+
+
+
+
