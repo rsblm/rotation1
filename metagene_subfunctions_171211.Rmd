@@ -20,119 +20,48 @@ library("ggplot2")
 
 "//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa"
 
+source for functions
+
 
 
 ```{r}
 metageneplot <- function(bigwig_files_location, name, plus, minus, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed", binsize=5) {
+  
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/geneslist.R", local=T)
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metagene_filelist.R", local=T)
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_genelist.R", local=T)
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/countoverlap_fun.R", local=T)
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/revneg_fun.R", local=T)
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metatable_fun.R", local=T)
 
-#Standard is genes according to Steinmetz lab Pechano et al. 2013
-
-genes_plus <- read.table(pos_strand)
-genes_minus <- read.table(neg_strand)
-
-#Specify region of interest
-promoter_regionPlus <- genes_plus[]
-promoter_regionPlus[,3] <- genes_plus[,2]+plus
-promoter_regionPlus[,2] <- genes_plus[,2]-minus
-
-promoter_regionMinus <- genes_minus[]
-promoter_regionMinus[,3] <- genes_minus[,3]+minus
-promoter_regionMinus[,2] <- genes_minus[,3]-plus
-
-promoter_region <- rbind(promoter_regionMinus, promoter_regionPlus) ### don't change the order of minus/plus region without changing the renaming of the rownames of the minus strand just after the CountOverlap bit (chunk 5)
-
+##### Define region of interest
+promoter_region <- regionlist(plus, minus, pos_strand, neg_strand)
+  
 ##### Data import
- filelist(bigwig_files_location = bigwig_files_location, name=name)
+filesbw <- filelist(bigwig_files_location, name)
 
 
 ##### Make a matrix with the bins for every gene
 
-rangelength <- promoter_region[1,3]-promoter_region[1,2]
-numberbin <- rangelength/binsize
-
-if (identical(round(numberbin), numberbin)) {
-  
-} else{
-  print("The combination of genomic range and binsize makes the number of bins not round. So either change them or fix this problem in the code")
-}
-
-
-bin_matrix <- as.data.frame(matrix(nrow=(nrow(promoter_region)*numberbin), ncol=6))
-colnames(bin_matrix) <- c("gene", "bin#", "chr", "start", "end", "strand")
-
-bin_matrix[,1] <- rep(promoter_region[,4], each=numberbin)
-bin_matrix[,2] <- rep(seq(1, numberbin), times=nrow(promoter_region))
-bin_matrix[,3] <- rep(promoter_region[,1], each=numberbin)
-bin_matrix[,6] <- rep(promoter_region[,6], each=numberbin)
-bin_matrix[,4] <- rep(promoter_region[,2], each=numberbin)
-bin_matrix[,4] <- bin_matrix[,4]+(binsize*(bin_matrix[,2]-1))
-bin_matrix[,5] <- (bin_matrix[,4]+(binsize-1))
-
-
-bin_grange <- makeGRangesFromDataFrame(bin_matrix, seqnames.field = "chr", start.field = "start", end.field = "end", keep.extra.columns = TRUE)
-# Now bins are not overlapping (so have a  size of binsize in GRanges object) and the last bp in the promoter region is lost...
-
+ matrix_grange <- bin_matrix(promoter_region, binsize)
+ bin_matrix <- matrix_grange$bin_matrix
+ bin_grange <- matrix_grange$bin_grange
+ numberbin <- matrix_grange$numberbin
 
 #### CountOverlap bit
 
-
-binned_matrix <- matrix(NA, nrow =  length(bin_grange), ncol = length(filesbw))
-
-colnames(binned_matrix) <- names(filesbw)
-rownames(binned_matrix) <- bin_matrix[,2] ### try to make it Bin + bin number
-
-
-for (i in seq_len(length(filesbw))) {
-  
-  
-  bigimp <- import.bw(filesbw[i])
-  
-  if (any(grep("plus", filesbw[i]))) {
-  strand(bigimp) <- "+"
-  } else {
-    if (any(grep("minus", filesbw[i]))) {
-    strand(bigimp) <- "-"
-    }else{
-  print("no strand specified")
-  }
-  }
-  
-  
-  binned_matrix[,i] <- countOverlaps(bin_grange, bigimp)
-}
-
+binned_matrix <- overlapcount(bin_grange, filesbw, bin_matrix)
 
 ###Reverse rownames of negative strands: WORKS ONLY AS LONG AS genes_minus is first half, otherwise you have to change this bit
-rn <- rownames(binned_matrix)
-rownames(binned_matrix) <- c(rev(rn[1:length(which(bin_matrix[,6]=="-"))]), rn[(length(which(bin_matrix[,6]=="-"))+1):length(rn)])
-
-
-
+binned_matrix <- revneg(binned_matrix, bin_matrix)
 
 ### sum over bins
-metagene_table <- as.data.frame(matrix(NA, nrow=numberbin, ncol = length(filesbw)))
-colnames(metagene_table) <- names(filesbw) 
-
-for (i in 1:numberbin) { 
- for (j in 1:ncol(binned_matrix)) {
-
-    metagene_table[i,j] <- mean(binned_matrix[which(row.names(binned_matrix)==i),j])
-
- }
-}
-
-
-
-#combined_matrix <- as.data.frame(matrix(NA, nrow=numberbin, ncol = length(filesbw)/2))
-#combined_matrix[1:numberbin,1] <- colSums(metagene_table[1:2,1:2])
-#combined_matrix[,2] <- colSums(metagene_table[,3:4])
+metagene_table <- metatable(numberbin, filesbw, binned_matrix)
 
 
 ###Plot bit
 #lineplot
 ggplot(data = metagene_table, aes(x=1:numberbin)) + geom_line(aes(y=metagene_table[,1], colour="dst1_minus"))+ geom_line(aes(y=metagene_table[,2], colour="dst1_plus"))+ geom_line(aes(y=metagene_table[,3], colour="spt4_minus"))+ geom_line(aes(y=metagene_table[,4], colour= "spt4_plus")) + scale_colour_manual("", breaks = c("dst1_minus", "dst1_plus", "spt4_minus","spt4_plus"), values = c("red", "green", "blue","cornflowerblue"))
-
-#ggplot(data = combined_matrix, aes(x=1:numberbin)) + geom_line(aes(y=combined_matrix[,1], colour="dst1"))+ geom_line(aes(y=combined_matrix[,2], colour="spt4"))+ scale_colour_manual("", breaks = c("dst1", "spt4"), values = c("orange","cornflowerblue"))
 
 }
 
