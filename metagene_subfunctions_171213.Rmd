@@ -1,0 +1,85 @@
+---
+title: "metagene"
+output: html_notebook
+version: 
+---
+
+```{r}
+source("https://bioconductor.org/biocLite.R")
+biocLite("GenomicRanges")
+biocLite("ggplot2")
+biocLite("rtracklayer")
+library("rtracklayer")
+library("GenomicRanges")
+library("ggplot2")
+```
+
+############ what has happened to genes that are overlapping. Multiple transcription start sites.
+############ data is not normalised yet?
+
+
+"//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa"
+
+
+
+
+```{r}
+metageneplot <- function(bigwig_files_location, name, plus, minus, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed", binsize=5) {
+  
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/geneslist.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metagene_filelist.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_genelist.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/countoverlap_fun.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/revneg_fun.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metatable_fun.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/combstrand_fun.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/graph_samples_fun.R")
+  
+  
+##### Define region of interest
+promoter_region <- regionlist(plus, minus, pos_strand, neg_strand)
+  
+##### Data import
+filesbw <- filelist(bigwig_files_location, name)
+
+
+##### Make a matrix with the bins for every gene
+
+ matrix_grange <- bin_matrix(promoter_region, binsize)
+ bin_matrix <- matrix_grange$bin_matrix
+ bin_grange <- matrix_grange$bin_grange
+ numberbin <- matrix_grange$numberbin
+
+#### CountOverlap bit
+binned_matrix <- overlapcount(bin_grange, filesbw, bin_matrix)
+
+###Reverse rownames of negative strands: WORKS ONLY AS LONG AS genes_minus is first half, otherwise you have to change this bit
+binned_matrix <- revneg(binned_matrix, bin_matrix)
+
+### sum over bins
+metagene_table <- metatable(numberbin, filesbw, binned_matrix)
+
+### Combine positive and negative strand of same sample
+combined <- comstrand(metagene_table)
+
+
+###Plot bit
+#lineplot
+graph_samples(combined)
+
+}
+
+```
+
+
+```{r}
+metageneplot("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "churchman", plus=1500, minus=500)
+
+
+
+```
+
+
+
+
+
