@@ -9,7 +9,8 @@ numberbin <- rangelength/binsize
 if (identical(round(numberbin), numberbin)) {
   
 } else{
-  print("The combination of genomic range and binsize makes the number of bins not round. So either change them or fix this problem in the code")
+  print("The combination of genomic range and binsize makes the number of bins not round. So either change them or fix this problem somehow")
+  stop()
 }
 
 
