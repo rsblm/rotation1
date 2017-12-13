@@ -17,10 +17,10 @@ overlapcount <- function(bin_grange, filesbw, bin_matrix) {
   
     bigimp <- import.bw(filesbw[i])
   
-    if (any(grep("plus", filesbw[i]))) {
+    if (any(grep("plus|posstrand|unipos", filesbw[i]))) {
       strand(bigimp) <- "+"
     } else {
-      if (any(grep("minus", filesbw[i]))) {
+      if (any(grep("minus|negstrand|unimin", filesbw[i]))) {
         strand(bigimp) <- "-"
       }else{
         print("no strand specified")
