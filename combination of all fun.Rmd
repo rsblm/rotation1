@@ -26,13 +26,13 @@ promoter_region <- regionlist(plus=1000, minus=500, pos_strand="//biochstore4.bi
 Data import
 ```{r}
 source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metagene_filelist.R", local=T)
-filesbw <- filelist("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "uzun")
+filesbw <- filelist("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "churchman")
 ``` 
 
 
 Make a matrix with the bins for every gene
 ```{r}
-  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_genelist.R", local=T)
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_genelist.R")
  listwv <- bin_matrix(promoter_region, binsize=5)
  bin_matrix <- listwv$bin_matrix
  bin_grange <- listwv$bin_grange
@@ -47,7 +47,10 @@ binned_matrix <- overlapcount(bin_grange, filesbw, bin_matrix)
 
 ###Reverse rownames of negative strands: WORKS ONLY AS LONG AS genes_minus is first half, otherwise you have to change this bit
 source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/revneg_fun.R", local=T)
-binned_matrix <- revneg(binned_matrix, bin_matrix)
+binned_matrix <- revneg(test_binned_matrix2, bin_matrix)
+
+binned_matrix <- cbind(test_binned_matrix[,1], binned_matrix)
+
 
 ```
 
@@ -59,43 +62,22 @@ sum over bins
 source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metatable_fun.R", local=T)
 
 metagene_table <- metatable(numberbin, filesbw, binned_matrix)
+
+binned_matrix <- binned_matrix[,2:13]
+
+source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/combstrand_fun.R")
+combined <- comstrand(metagene_table)
+
+
+
 ############ what has happened to genes that are overlapping. Multiple transcription start sites.
 ############ data is not normalised yet?
 ```
 
 
-Combine pos and neg strand
 ```{r}
-combined_matrix <- as.data.frame(matrix(NA, nrow=numberbin, ncol = length(filesbw)/2))
-combined_matrix[1:numberbin,1] <- colSums(metagene_table[1:2,1:2])
-combined_matrix[,2] <- colSums(metagene_table[,3:4])
-
-
-```
-
-
-```{r}
-#z <- ggplot(metagene_table, aes(y=metagene_table[,2], x=1:20))
-
-#qplot(y=metagene_table[,6], x=1:80)
-
-#z + geom_line()
-
-#pointplot
-#ggplot(data=metagene_table, aes(x=1:80)) + geom_point(aes(y=metagene_table[,1]), color="darkblue")+ geom_point(aes(y=metagene_table[,2]), color="red")+ geom_point(aes(y=metagene_table[,3]), color="orange")+ geom_point(aes(y=metagene_table[,4]), color= "cornflowerblue")+ geom_point(aes(y=metagene_table[,5]), colour="green")+ geom_point(aes(y=metagene_table[,6]), colour="purple") 
-
-#lineplot
-ggplot(data = metagene_table, aes(x=1:numberbin)) + geom_line(aes(y=metagene_table[,1], colour="dst1_minus"))+ geom_line(aes(y=metagene_table[,2], colour="dst1_plus"))+ geom_line(aes(y=metagene_table[,3], colour="spt4_minus"))+ geom_line(aes(y=metagene_table[,4], colour= "spt4_plus")) + scale_colour_manual("", breaks = c("dst1_minus", "dst1_plus", "spt4_minus","spt4_plus"), values = c("red", "green", "blue","cornflowerblue"))
-
-ggplot(data = combined_matrix, aes(x=1:numberbin)) + geom_line(aes(y=combined_matrix[,1], colour="dst1"))+ geom_line(aes(y=combined_matrix[,2], colour="spt4"))+ scale_colour_manual("", breaks = c("dst1", "spt4"), values = c("orange","cornflowerblue"))
-
-#+ geom_line(aes(y=metagene_table[,3], colour="spt4_minus"))+ geom_line(aes(y=metagene_table[,4], colour= "spt4_plus")) + scale_colour_manual("", breaks = c("dst1_minus", "dst1_plus", "spt4_minus","spt4_plus"), values = c("red", "green", "blue","cornflowerblue"))
-
-
-#+ geom_line(aes(y=metagene_table[,5]), colour="green")+ geom_line(aes(y=metagene_table[,6]), colour="purple")+scale_fill_discrete(labels = c("1", "2", "3", "4", "5", "6"))+theme(legend.position="right")
-
-
-#ggplot(data=metagene_table, aes(x=1:80, y=metagene_ta))
+source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/graph_samples_fun.R")
+graph_samples(combined)
 ```
 
 
