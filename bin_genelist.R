@@ -2,6 +2,7 @@
 
 
 bin_matrix <- function(promoter_region, binsize){
+require("GenomicRanges")
 
 rangelength <- promoter_region[1,3]-promoter_region[1,2]
 numberbin <- rangelength/binsize
