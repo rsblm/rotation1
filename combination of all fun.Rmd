@@ -16,7 +16,7 @@ library("ggplot2")
 
 Constructing genomic intervals of interest
 ```{r}
-source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/geneslist.R", local=T)
+source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/geneslist.R")
 promoter_region <- regionlist(plus=1000, minus=500, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed")
 
 ```
@@ -37,6 +37,7 @@ Make a matrix with the bins for every gene
  bin_matrix <- listwv$bin_matrix
  bin_grange <- listwv$bin_grange
  numberbin <- listwv$numberbin
+
  
 ```
 
@@ -47,9 +48,8 @@ binned_matrix <- overlapcount(bin_grange, filesbw, bin_matrix)
 
 ###Reverse rownames of negative strands: WORKS ONLY AS LONG AS genes_minus is first half, otherwise you have to change this bit
 source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/revneg_fun.R", local=T)
-binned_matrix <- revneg(test_binned_matrix2, bin_matrix)
+stri_bins <- revneg(bin_matrix)
 
-binned_matrix <- cbind(test_binned_matrix[,1], binned_matrix)
 
 
 ```
@@ -59,11 +59,11 @@ binned_matrix <- cbind(test_binned_matrix[,1], binned_matrix)
 sum over bins
 
 ```{r}
-source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metatable_fun.R", local=T)
+source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/normalisiation_FUN.R")
+binned_matrix <- normalisation(binned_matrix,numberbin)
 
-metagene_table <- metatable(numberbin, filesbw, binned_matrix)
-
-binned_matrix <- binned_matrix[,2:13]
+source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_sum_withapply_FUN.R")
+metagene_table <- bin_sum(binned_matrix, stri_bins)
 
 source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/combstrand_fun.R")
 combined <- comstrand(metagene_table)
