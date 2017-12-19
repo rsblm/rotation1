@@ -1,4 +1,4 @@
-filelist <- function(bigwig_files_location, name) {
+filelist <- function(bigwig_files_location, name, MinPlus_ann) {
   ##### makes a list of the bigwigfile locations to be used, expects a string with the path and a string with the name of the files to be analysed. 
   # Also associates names with the bigwig files, which is essential for later naming and combining strands
   
