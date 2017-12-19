@@ -1,4 +1,4 @@
-graph_samples <- function(combined){
+graph_samples <- function(combined, minus, plus, numberbin){
 #Function that makes a linegraph for every sample in the same graph, detects number of samples etc
   #Expects a dataframe with columns for each sample and row being bins
   suppressPackageStartupMessages(require(ggplot2))
