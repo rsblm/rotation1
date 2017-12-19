@@ -4,12 +4,17 @@ graph_samples <- function(combined){
   suppressPackageStartupMessages(require(ggplot2))
   suppressPackageStartupMessages(require(reshape2))
   
-  combined2 <- cbind(rep(1:nrow(combined), times=ncol(combined)), combined, row.names=NULL)
-  colnames(combined2) <- c("number", colnames(combined))
-  mcom <- melt(combined2, id="number", measure=colnames(combined))
+  combined2 <- cbind(rownames(combined) <- round(seq(-minus, plus, (plus-(-minus))/(numberbin-1))), combined, row.names=NULL)
+  colnames(combined2) <- c("bp", colnames(combined))
+  mcom <- melt(combined2, id="bp", measure=colnames(combined))
+  mcom2 <- mcom[6000:6600,]
   
-  ggplot(mcom, aes(number, value, colour = variable)) + geom_line(ylab="bp")
+  lp <- ggplot(mcom, aes(bp, value, colour = variable)) + geom_line()
+  lp2 <- lp + theme(legend.position="right")
+  return(lp2)
 }
 
 
 
+#colnames(combined) <- gsub('//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa/xrn1_glugalData/NETseq|*_NETseq_minus.bw|*_NETseq_plus.bw|/uzun_*', '', filesbw)
+#|ntsub_unsmo_posstrand.bigwig|ntsub_unsmo_negstrand.bigwig|nnt_unipos.bw|nnt_unimin.bw
