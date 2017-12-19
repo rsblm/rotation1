@@ -15,7 +15,7 @@ if (identical(round(numberbin), numberbin)) {
 
 
 bin_matrix <- as.data.frame(matrix(nrow=(nrow(promoter_region)*numberbin), ncol=6))
-colnames(bin_matrix) <- c("gene", "bin#", "chr", "start", "end", "strand")
+colnames(bin_matrix) <- c("gene", "bin_num", "chr", "start", "end", "strand")
 
 bin_matrix[,1] <- rep(promoter_region[,4], each=numberbin)
 bin_matrix[,2] <- rep(seq(1, numberbin), times=nrow(promoter_region))
