@@ -7,7 +7,7 @@ metatable <- function(numberbin, filesbw, binned_matrix) {
   for (i in 1:numberbin) { 
     for (j in 1:ncol(binned_matrix)) {
      
-     metagene_table[i,j] <- mean(binned_matrix[which(row.names(binned_matrix)==i),j])
+     metagene_table[i,j] <- sum(binned_matrix[which(row.names(binned_matrix)==i),j])
     
     }
   }
