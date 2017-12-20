@@ -1,10 +1,10 @@
-#### Invert negative strand bins
+revneg <- function(bin_matrix) {
+  #### Adds a column to binned_matrix that has the bin number and the reversered order binnumber for negative strand, effectively inverinting the negative strand fragments
+  ## Expects 2 matrices (?)
+  
+rn <- bin_matrix$bin_num
+stri_bins <- c(rev(rn[1:length(which(bin_matrix[,6]=="-"))]), rn[(length(which(bin_matrix[,6]=="-"))+1):length(rn)])
 
-revneg <- function(binned_matrix, bin_matrix) {
-
-rn <- rownames(binned_matrix)
-rownames(binned_matrix) <- c(rev(rn[1:length(which(bin_matrix[,6]=="-"))]), rn[(length(which(bin_matrix[,6]=="-"))+1):length(rn)])
-
-return(binned_matrix)
+return(stri_bins)
 
 }
