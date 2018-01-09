@@ -1,0 +1,56 @@
+metageneplot <- function(bigwig_files_location, name, plus, minus, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed", binsize=5, MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin")) {
+  ### Function that makes a metagene plot from bigwig files
+  #Default for variables: 
+  #   neg/pos strand location is bedfiles of genes according to Steinmetz lab Pechano et al. 2013
+  #   binsize=5 but that's quite arbitrary
+  #   It looks for annotation of the strand directionality of the file name, standard it would recognise "plus|posstrand|unipos","minus|negstrand|unimin". Specify as a string if it's different in the file names.
+  
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/geneslist_FUN.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metagene_filelist_FUN.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_genelist_FUN.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/countoverlap_fun.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/revneg_FUN.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_sum_withapply_FUN.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/combstrand_FUN.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/graph_samples_FUN.R")
+  
+  
+  ##### Define region of interest
+  res <- regionlist(plus, minus, pos_strand, neg_strand)
+  promoter_region <- res$promoter_region
+  
+  ##### Data import
+  filesbw <- filelist(bigwig_files_location, name, MinPlus_ann)
+  
+  
+  ##### Make a matrix with the bins for every gene
+  
+  matrix_grange <- bin_matrix(promoter_region, binsize)
+  bin_matrix <- matrix_grange$bin_matrix
+  bin_grange <- matrix_grange$bin_grange
+  numberbin <- matrix_grange$numberbin
+  
+  #### CountOverlap bit
+  binned_matrix <- overlapcount(bin_grange, filesbw, bin_matrix, MinPlus_ann)
+  
+  ###Reverse rownames of negative strands: WORKS ONLY AS LONG AS genes_minus is first half, otherwise you have to change this bit
+  stri_bins <- revneg(bin_matrix)
+  
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/normalisiation_FUN.R")
+  binned_matrix <- normalisation(binned_matrix,numberbin)
+  
+  
+  ### sum over bins
+  metagene_table <- bin_sum(binned_matrix, stri_bins)
+  
+  
+  ### Combine positive and negative strand of same sample
+  combined <- comstrand(metagene_table)
+  
+  
+  
+  
+  ###Plot bit
+  graph_samples(combined, minus, plus, numberbin, name)
+  
+}
