@@ -1,4 +1,4 @@
-regionlist <- function (plus, minus, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed") {
+regionlist <- function (plus, minus, pos_strand="/home/immd0754/S_MELLOR/Rosa/pos_strand_annotations.bed", neg_strand="/home/immd0754/S_MELLOR/Rosa/neg_strand_annotations.bed") {
   
   #Standard is genes according to Steinmetz lab Pechano et al. 2013
   genes_plus <-read.table(pos_strand)
@@ -18,7 +18,7 @@ regionlist <- function (plus, minus, pos_strand="//biochstore4.bioch.ox.ac.uk/Me
   
   promoter_region <- rbind(promoter_regionMinus, promoter_regionPlus) ### don't change the order of minus/plus region without changing the renaming of the rownames of the minus strand just after the CountOverlap bit (chunk 5)
   
-  res <- list(promoter_region=promoter_region, genes_plus=promoter_regionPlus1, genes_minus=promoter_regionMinus1)
+  res <- list(promoter_region=promoter_region, genes_plus=promoter_regionPlus, genes_minus=promoter_regionMinus)
   
   return(res)
 }
