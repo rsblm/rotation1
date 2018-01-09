@@ -1,0 +1,204 @@
+---
+title: "Different options with ggplot2"
+output: html_notebook
+---
+
+
+```{r}
+graph_samples <- function(combined, minus, plus, numberbin){
+#Function that makes a linegraph for every sample in the same graph, detects number of samples etc
+  #Expects a dataframe with columns for each sample and row being bins
+  suppressPackageStartupMessages(require(ggplot2))
+  #suppressPackageStartupMessages(require(reshape2))
+  
+  combined2 <- cbind(rownames(combined) <- round(seq(-minus, plus, (plus-(-minus))/(numberbin-1))), combined, row.names=NULL)
+  colnames(combined2) <- c("bp", colnames(combined))
+  mcom <- melt(combined2, id="bp", measure=colnames(combined))
+  mcom2 <- mcom[6000:6600,]
+  
+  lp <- ggplot(mcom, aes(bp, value, colour = variable)) + geom_line()
+  lp + theme(legend.position = "right")
+  }
+
+
+```
+
+
+```{r}
+lp2 + ggtitle(paste("Metagene from",name, "experiments", sep = " ")) + theme(legend.position = "right")
+```
+
+
+
+```{r}
+lp2 + ggtitle(paste("Metagene from",name, "experiments", sep = " ")) + theme(legend.position = "right", plot.title = element_text(size=15, face="bold", 
+    margin = margin(0, 0, 10, 0))) #top, right, bottom, left
+
+
+
+```
+
+
+```{r}
+##Using different fonts for text
+# But you have to download fonts first and do some set-up : http://zevross.com/blog/2014/07/30/tired-of-using-helvetica-in-your-r-graphics-heres-how-to-use-the-fonts-you-like-2/
+lp2 + ggtitle(paste("Metagene from",name, "experiments", sep = " ")) + theme(legend.position = "right", plot.title = element_text(size=15, face="bold", 
+    margin = margin(0, 0, 10, 0),lineheight=.8, 
+  vjust=1,family="Bauhaus 93"))
+
+
+```
+
+
+
+```{r}
+#Remove legend title (legend.title=...) + unfill the boxes in the legend(legend.key=.. fill=NA) + make the symbols in the legend bigger (with guides(... size=))
+
+lp2 + ggtitle(paste("Metagene from",name, "experiments", sep = " ")) + theme(legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(0, 0, 10, 0))) + guides(colour = guide_legend(override.aes = list(size=2)))
+
+
+
+```
+
+```{r}
+#Having a legend without having the levels:
+#  ggplot(nmmaps, aes(x=date, y=o3))+geom_line(color="grey")+geom_point(color="red")
+
+
+```
+
+
+
+
+```{r}
+## Now changing the colours but this is for a dataspecific way rather than one that is flexible for number of elements
+  
+lp2 + ggtitle(paste("Metagene from",name, "experiments", sep = " ")) + theme(legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(0, 0, 10, 0))) + scale_colour_manual(name='', values=c('booth_spt4_PROseq_'='cornflowerblue', 'booth_WT_PROseq_'='darkblue')) + guides(colour = guide_legend(override.aes = list(size=1.5)))
+
+
+
+```
+
+
+
+```{r}
+#Change background colour in theme(panel.background)
+lp2 + ggtitle(paste("Metagene from",name, "experiments", sep = " ")) + theme(panel.background = element_rect(fill = "grey95", colour="grey75"), legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(0, 0, 10, 0))) + scale_colour_manual(name='', values=c('booth_spt4_PROseq_'='cornflowerblue', 'booth_WT_PROseq_'='darkblue')) + guides(colour = guide_legend(override.aes = list(size=1.5)))
+
+#think about different element_rect: element_rect(fill = NULL, colour = NULL, size = NULL, linetype = NULL, color = NULL)
+# element_rect(fill="grey100") is white
+# element_rect(fill=..., colour="black") colour of the border
+# element_rect(fill=..., colour="black", size= ) size of the border, not really interesting (?)
+# element_rect(linetype= ) dotdash, longdash etc
+
+
+
+```
+
+
+```{r}
+#Gridlines - panel.grid.major(colour = "specify colour")
+
+fischl+ ggtitle(paste("Metagene from", "experiments", sep = " ")) + theme(panel.grid.major= element_line(colour = "grey80", size=0.001), panel.grid.minor= element_line(colour = "grey80", size=0.001), panel.background = element_rect(fill = "grey95", colour="grey75"), legend.position = "bottom", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(0, 0, 10, 0))) + guides(colour = guide_legend(override.aes = list(size=1.5)))
+
+
+
+
+```
+
+
+```{r}
+#Change background colour with theme(plot.background)
+
+churchman + ggtitle(paste("Metagene from", name, "experiments", sep = " ")) + theme(plot.background = element_rect(fil="grey95", colour = "grey70"), panel.grid.major= element_line(colour = "grey80", size=0.001), panel.grid.minor= element_line(colour = "grey80", size=0.001), panel.background = element_rect(fill = "grey90", colour="grey70"), legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(10, 0, 10, 0))) + scale_colour_manual(rainbow, values) + guides(colour = guide_legend(override.aes = list(size=1.5)))
+
+
+
+```
+
+
+
+
+```{r}
+#Make a grid/overview with several plots. Doesn't look very nice since you can't see all the plots properly
+
+churchman <- metageneplot("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "churchman", plus=1500, minus=500)
+fischl <- metageneplot("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/fischl_data", "fischl", plus=1500, minus=500)
+ronja <- metageneplot("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa/xrn1_glugalData/NETseq/bigwigs", "", plus=1500, minus=500)
+uzun <- metageneplot("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "uzun", plus=1500, minus=500)
+
+#library(grid)
+#pushViewport(viewport(layout = grid.layout(1, 2)))
+#print(myplot1, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+#print(myplot2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+
+# alternative, a little easier
+library(gridExtra)
+grid.arrange(churchman, fischl, ronja, uzun, ncol=2)
+
+
+```
+
+
+
+
+
+```{r}
+#Using themes
+source("https://bioconductor.org/biocLite.R")
+biocLite("ggthemes")
+
+library(ggthemes)
+
+
+churchman+theme_economist()+scale_colour_economist() # bit too blue
+churchman+theme_base()+scale_colour_colorblind() # nice and simple
+
+churchman+theme_few()+scale_colour_few() # also nice and simple, bit nicer
+churchman+theme_hc()+scale_colour_hc() # legend below, works quite well
+churchman+theme_stata()+scale_colour_stata()+scale_shape_stata() + scale_linetype_stata() # legend below, works quite well but not as good as the one above
+churchman + theme_tufte() + scale_colour_tableau() # nice colours, very simple theme
+churchman + theme_wsj() + scale_colour_tableau()
+
+churchman+theme_few() + scale_colour_tableau() + scale_shape_tableau()
+churchman+theme_few() + scale_colour_pander()
+churchman+theme_few() + scale_colour_ptol()
+churchman+theme_few() + scale_fill_ptol()
+```
+
+
+
+
+
+
+
+```{r}
+#Finding best automatic colour fill
+
+churchman + ggtitle(paste("Metagene from", name, "experiments", sep = " ")) + theme(plot.background = element_rect(fil="grey95", colour = "grey70"), panel.grid.major= element_line(colour = "grey80", size=0.001), panel.grid.minor= element_line(colour = "grey80", size=0.001), panel.background = element_rect(fill = "grey90"), legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(10, 0, 10, 0))) + scale_colour_tableau() + guides(colour = guide_legend(override.aes = list(size=1.5)))
+
+uzun + ggtitle(paste("Metagene from", name, "experiments", sep = " ")) + theme(plot.background = element_rect(fil="grey95", colour = "grey70"), panel.grid.major= element_line(colour = "grey80", size=0.001), panel.grid.minor= element_line(colour = "grey80", size=0.001), panel.background = element_rect(fill = "grey90"), legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(10, 0, 10, 0))) + scale_colour_tableau() + guides(colour = guide_legend(override.aes = list(size=1.5)))
+
+churchman + ggtitle(paste("Metagene from", name, "experiments", sep = " ")) + theme(plot.background = element_rect(fil="grey95", colour = "grey70"), panel.grid.major= element_line(colour = "grey80", size=0.001), panel.grid.minor= element_line(colour = "grey80", size=0.001), panel.background = element_rect(fill = "grey90"), legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(10, 0, 10, 0))) + scale_colour_ptol() + guides(colour = guide_legend(override.aes = list(size=1.5)))
+
+uzun + ggtitle(paste("Metagene from", name, "experiments", sep = " ")) + theme(plot.background = element_rect(fil="grey95", colour = "grey70"), panel.grid.major= element_line(colour = "grey80", size=0.001), panel.grid.minor= element_line(colour = "grey80", size=0.001), panel.background = element_rect(fill = "grey90"), legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(10, 0, 10, 0))) + scale_colour_ptol() + guides(colour = guide_legend(override.aes = list(size=1.5)))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

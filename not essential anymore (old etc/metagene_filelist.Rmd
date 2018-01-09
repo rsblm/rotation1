@@ -1,0 +1,14 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+filelist <- function(name) {
+
+    pat <- paste("*",name,"*.bw|*",name, "*.bigwig", sep="")
+ }
+
+
+
+```
