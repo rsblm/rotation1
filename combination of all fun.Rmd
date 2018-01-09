@@ -16,8 +16,16 @@ library("ggplot2")
 
 Constructing genomic intervals of interest
 ```{r}
-source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/geneslist.R")
-promoter_region <- regionlist(plus=1000, minus=500, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed")
+source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/geneslist_FUN.R")
+res <- regionlist(plus=1000, minus=500, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed")
+
+
+promoter_region <- res$promoter_region
+genes_plus <- res$genes_plus
+genes_minus <- res$genes_minus
+
+source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/overlap1_FUN.R")
+promoter_region <- overlap1(promoter_region, genes_plus, genes_minus, minus=500)
 
 ```
 
@@ -25,14 +33,14 @@ promoter_region <- regionlist(plus=1000, minus=500, pos_strand="//biochstore4.bi
 
 Data import
 ```{r}
-source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metagene_filelist.R", local=T)
-filesbw <- filelist("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "churchman")
+source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metagene_filelist_FUN.R", local=T)
+filesbw <- filelist("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "churchman", MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
 ``` 
 
 
 Make a matrix with the bins for every gene
 ```{r}
-  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_genelist.R")
+  source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_genelist_FUN.R")
  listwv <- bin_matrix(promoter_region, binsize=5)
  bin_matrix <- listwv$bin_matrix
  bin_grange <- listwv$bin_grange
@@ -44,7 +52,7 @@ Make a matrix with the bins for every gene
 CountOverlap bit
 ```{r}
 source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/countoverlap_fun.R", local=T)
-binned_matrix <- overlapcount(bin_grange, filesbw, bin_matrix)
+binned_matrix <- overlapcount(bin_grange, filesbw, bin_matrix, MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
 
 ###Reverse rownames of negative strands: WORKS ONLY AS LONG AS genes_minus is first half, otherwise you have to change this bit
 source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/revneg_fun.R", local=T)
@@ -77,7 +85,7 @@ combined <- comstrand(metagene_table)
 
 ```{r}
 source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/graph_samples_fun.R")
-graph_samples(combined)
+graph_samples(combined, plus=1000, minus=500, numberbin, name="booth")
 ```
 
 

@@ -36,7 +36,7 @@ genes_minus <- res$genes_minus
 Data import
 ```{r}
 source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metagene_filelist_FUN.R")
-filesbw <- filelist("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "churchman", MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
+filesbw <- filelist("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "uzun", MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
 ``` 
 
 
@@ -48,11 +48,15 @@ dimnames(test)[[1]] # all genes in the array
 
 test_bw <- import.bw
 
-s <- (promoter_region$V2[[1]]:(promoter_region$V3[[1]]-1))
+:nrow(genes_minus)
+
+for (i in 1:3683) {
+
+s <- (promoter_region$V2[[i]]:(promoter_region$V3[[i]]-1))
 ## I want to define s by gene_name(so we can link it to the array or something), so one thing that might help is rownames(promoter_region) <- promoter_region$V4 and another thing is we need to drop levels of genes(somehow with subsetting previously(too short genes, overlapping etc) this hasn't happened yet) for this droplevels(promoter_region$V4). Don't know if that drop levels is at all relevant. 
 
 b <- as.data.frame(test_bw)
-b2 <- b[(b$seqnames==as.character(promoter_region$V1[[1]])),] # Specify chr. Added as.character because otherwise you're comparing factors and they don't have the same levels (because the bigwig file has chrM and promoter_region not), but maybe this is not the best solution
+b2 <- b[(b$seqnames==as.character(promoter_region$V1[[i]])),] # Specify chr. Added as.character because otherwise you're comparing factors and they don't have the same levels (because the bigwig file has chrM and promoter_region not), but maybe this is not the best solution
 b3 <- b2[b2$end>min(s),]
 b3 <- b3[b3$start<max(s),]
 
@@ -61,19 +65,18 @@ if(sum(b3$width)>=length(s)){
   b3[nrow(b3),3] <- max(s)
   c <- rep(b3$score, times=((b3$end-b3$start)+1))
  
-} else if(max(b3$width)==1) {
+} else if(max(b2$width)==1) {
   c <- vector("numeric", length(s)) # fill this at position of b3$start with value score
   b3$start <- b3$start-min(s)
   c[b3$start] <- b3$score
 } else {
-  print("The count overlap method doesn't work with this bw file yet but if you think about it you can probably change the code")
+  print(i)
 }
 
 
-test[promoter_region$V4[[1]], 1,] <- c
+test[as.character(promoter_region$V4[[i]]), 1,] <- c
 
-
-### This for loop seems to do the trick but maybe it's a bit omslachtig nog... Vooral met het eerst creeren van s.. alle loss eindjes moeten nog samen, dit moet nu in de array op de goede plaats
+}
 
 
 
