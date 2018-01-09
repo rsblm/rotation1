@@ -1,4 +1,4 @@
-function (plus, minus, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed") {
+regionlist <- function (plus, minus, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed") {
   
   #Standard is genes according to Steinmetz lab Pechano et al. 2013
   genes_plus <-read.table(pos_strand)
