@@ -18,7 +18,7 @@ regionlist <- function (plus, minus, pos_strand="/home/immd0754/S_MELLOR/Rosa/po
   
   promoter_region <- rbind(promoter_regionMinus, promoter_regionPlus) ### don't change the order of minus/plus region without changing the renaming of the rownames of the minus strand just after the CountOverlap bit (chunk 5)
   
-  res <- list(promoter_region=promoter_region, genes_plus=promoter_regionPlus, genes_minus=promoter_regionMinus)
-  
+ res <- list(promoter_region=promoter_region, genes_plus=promoter_regionPlus, genes_minus=promoter_regionMinus)
+ 
   return(res)
 }
