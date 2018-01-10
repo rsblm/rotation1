@@ -16,8 +16,8 @@ library("ggplot2")
 
 Constructing genomic intervals of interest
 ```{r}
-source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/geneslist_FUN_subsetlength.R")
-res <- regionlist(plus=1000, minus=500, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed")
+source("/home/immd0754/Documents/R_things/General R scripts/metagene/geneslist_FUN_subsetlength.R")
+res <- regionlist(plus=1000, minus=500, pos_strand="/home/immd0754/S_MELLOR/Rosa/pos_strand_annotations.bed", neg_strand="/home/immd0754/S_MELLOR/Rosa/neg_strand_annotations.bed")
 
 
 promoter_region <- res$promoter_region
@@ -25,7 +25,7 @@ genes_plus <- res$genes_plus
 genes_minus <- res$genes_minus
 
 
-## Don't use at it is because it makes the promoter region longer??
+## Don't use at it is because it makes the promoter region list longer??
 #source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/overlap1_FUN.R")
 #promoter_region <- overlap1(promoter_region, genes_plus, genes_minus, minus=500)
 
@@ -35,8 +35,8 @@ genes_minus <- res$genes_minus
 
 Data import
 ```{r}
-source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/metagene_filelist_FUN.R")
-filesbw <- filelist("//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/cerevisiae_dataForRosa", "uzun", MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
+source("/home/immd0754/Documents/R_things/General R scripts/metagene/metagene_filelist_FUN.R")
+filesbw <- filelist("/home/immd0754/S_MELLOR/Rosa/cerevisiae_dataForRosa", "uzun", MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
 ``` 
 
 
@@ -70,7 +70,7 @@ if(sum(b3$width)>=length(s)){
   b3$start <- b3$start-min(s)
   c[b3$start] <- b3$score
 } else {
-  print(i)
+  print("For now this doesn't work yet with this bw file, because it neither has continues values nor only the values with width 1. I'm sure you can solve it if you look in the second approach (after else if) an combine it with the first approach")
 }
 
 
@@ -88,6 +88,12 @@ promoter_regionPlus <- genes_plus[(genes_plus$V3-genes_plus$V2)>1000,]
  bin_grange <- listwv$bin_grange
  numberbin <- listwv$numberbin
 
+test2 <- matrix(data=NA, nrow=nrow(promoter_region), ncol = plus+minus)
+
+s <- apply(test2, 1, promoter_region=promoter_region, test_s)
+ 
+ 
+ 
  
 ```
 
