@@ -8,6 +8,7 @@ regionlist <- function (plus, minus, pos_strand="/home/immd0754/S_MELLOR/Rosa/po
   genes_minus <- read.table(neg_strand)
 
 #Select genes of length 1000<gene<4000    
+  # To decide on length of genes, have a look at plot(sort(genes_minus$V3-genes_minus$V2))
   promoter_regionPlus <- genes_plus[(genes_plus$V3-genes_plus$V2)>1000,]
   promoter_regionPlus <- promoter_regionPlus[(promoter_regionPlus$V3-promoter_regionPlus$V2)<4000,]
   promoter_regionPlus1 <- promoter_regionPlus
@@ -26,6 +27,3 @@ regionlist <- function (plus, minus, pos_strand="/home/immd0754/S_MELLOR/Rosa/po
   
   return(res)
 }
-
-
-
