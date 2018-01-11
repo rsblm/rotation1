@@ -40,7 +40,57 @@ filesbw <- filelist("/home/immd0754/S_MELLOR/Rosa/cerevisiae_dataForRosa", "uzun
 ``` 
 
 
-Make the array
+
+
+
+
+```{r}
+b <- as.data.frame(test_bw)
+
+l <- levels(b$seqnames)
+l <- l[!l=="chrM"]
+
+f <- (1:length(l))
+
+
+for (i in 1:length(l)) {
+  
+  f[[i]] <- max(b[(b$seqnames==as.character(l[[i]])),]$end)
+  
+}
+
+t <- lapply(f, function(x) vector("numeric", x))
+names(t) <- l
+
+for (i in 1:length(l)) {
+
+t[[1]][b[(b$seqnames==as.character(l[[1]])),]$start:b[(b$seqnames==as.character(l[[1]])),]$end] <- b[(b$seqnames==as.character(l[[i]])),]$score
+
+}
+
+
+> for (i in 1:3) {
++ x[y2[i,1]:y2[i,2]] <- y[i,3]
++ }
+
+
+``` 
+
+
+```{r}
+m <- matrix(NA, nrow=nrow(genes_minus), ncol=plus+minus+1)
+rownames(m) <- genes_minus$V4
+
+for (i in 1:nrow(m)) {
+m[i,] <- t[[genes_minus$V1[i]]][genes_minus$V2[i]:genes_minus$V3[i]]
+}
+``` 
+
+
+
+
+
+
 ```{r}
 gene_array <- array(data=NA, dim=c(nrow(promoter_region), length(filesbw), plus+minus), dimnames= list(promoter_region$V4, names(filesbw)))
 
