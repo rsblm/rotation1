@@ -16,7 +16,7 @@ library("ggplot2")
 
 Constructing genomic intervals of interest
 ```{r}
-source("/home/immd0754/Documents/R_things/General R scripts/metagene/geneslist_FUN_subsetlength.R")
+source("/home/immd0754/Documents/R_things/General R scripts/metagene/regionlist_length_yeast_FUN.R")
 res <- regionlist(plus=1000, minus=500, pos_strand="/home/immd0754/S_MELLOR/Rosa/pos_strand_annotations.bed", neg_strand="/home/immd0754/S_MELLOR/Rosa/neg_strand_annotations.bed")
 
 
@@ -42,41 +42,68 @@ filesbw <- filelist("/home/immd0754/S_MELLOR/Rosa/cerevisiae_dataForRosa", "uzun
 
 Make the array
 ```{r}
-test <- array(data=NA, dim=c(nrow(promoter_region), length(filesbw), plus+minus), dimnames= list(promoter_region$V4, names(filesbw)))
-dimnames(test)[[1]] # all genes in the array
+gene_array <- array(data=NA, dim=c(nrow(promoter_region), length(filesbw), plus+minus), dimnames= list(promoter_region$V4, names(filesbw)))
 
+for (f in 1:seq_len(length(filesbw))) {
 
-test_bw <- import.bw
+    bigimp <- import.bw(filesbw[f])
+    
+  if (any(grep(MinPlus_ann[[2]], filesbw[f]))) {
 
-:nrow(genes_minus)
+        for (i in 1:20) {
 
-for (i in 1:3683) {
+            b <- as.data.frame(bigimp)
+            b2 <- b[(b$seqnames==as.character(genes_minus$V1[[i]])),] # Specify chr. Added as.character because otherwise you're comparing factors and they don't have the same levels (because the bigwig file has chrM and promoter_region not), but maybe this is not the best solution
+            b3 <- b2[b2$end>=genes_minus$V2[[i]],]
+            b3 <- b3[b3$start<=(genes_minus$V3[[i]]-1),]
+            
+            if(sum(b3$width)>=minus+plus){
+              b3[1,2] <- genes_minus$V2[[i]]
+              b3[nrow(b3),3] <- (genes_minus$V3[[i]]-1)
+              c <- rep(b3$score, times=((b3$end-b3$start)+1))
+              
+            } else if(max(b2$width)==1) {
+              c <- vector("numeric", minus+plus) # fill this at position of b3$start with value score
+              b3$start <- b3$start-genes_minus$V2[[i]]
+              c[b3$start] <- b3$score
+            } else {
+              print("For now this doesn't work yet with this bw file, because it neither has continues values nor only the values with width 1. I'm sure you can solve it if you look in the second approach (after else if) an combine it with the first approach")
+            }
+            
+            
+            gene_array[as.character(genes_minus$V4[[i]]), f,] <- c
+            }
 
-s <- (promoter_region$V2[[i]]:(promoter_region$V3[[i]]-1))
-## I want to define s by gene_name(so we can link it to the array or something), so one thing that might help is rownames(promoter_region) <- promoter_region$V4 and another thing is we need to drop levels of genes(somehow with subsetting previously(too short genes, overlapping etc) this hasn't happened yet) for this droplevels(promoter_region$V4). Don't know if that drop levels is at all relevant. 
+    
+      } else {
+      if (any(grep(MinPlus_ann[[1]], filesbw[f]))) {
+        strand(bigimp) <- "-"
+      }else{
+        print("no strand specification found")
+      }
+    }
 
-b <- as.data.frame(test_bw)
-b2 <- b[(b$seqnames==as.character(promoter_region$V1[[i]])),] # Specify chr. Added as.character because otherwise you're comparing factors and they don't have the same levels (because the bigwig file has chrM and promoter_region not), but maybe this is not the best solution
-b3 <- b2[b2$end>min(s),]
-b3 <- b3[b3$start<max(s),]
-
-if(sum(b3$width)>=length(s)){
-  b3[1,2] <- min(s)
-  b3[nrow(b3),3] <- max(s)
-  c <- rep(b3$score, times=((b3$end-b3$start)+1))
- 
-} else if(max(b2$width)==1) {
-  c <- vector("numeric", length(s)) # fill this at position of b3$start with value score
-  b3$start <- b3$start-min(s)
-  c[b3$start] <- b3$score
-} else {
-  print("For now this doesn't work yet with this bw file, because it neither has continues values nor only the values with width 1. I'm sure you can solve it if you look in the second approach (after else if) an combine it with the first approach")
 }
+    
+```    
+
+   
 
 
-test[as.character(promoter_region$V4[[i]]), 1,] <- c
+```{r}
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -103,7 +130,7 @@ source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/countove
 binned_matrix <- overlapcount(bin_grange, filesbw, bin_matrix, MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
 
 ###Reverse rownames of negative strands: WORKS ONLY AS LONG AS genes_minus is first half, otherwise you have to change this bit
-source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/revneg_fun.R", local=T)
+source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/rev1neg_fun.R", local=T)
 stri_bins <- revneg(bin_matrix)
 
 
