@@ -1,8 +1,9 @@
+regionlist <- function (plus, minus, pos_strand="/home/immd0754/S_MELLOR/Rosa/pos_strand_annotations.bed", neg_strand="/home/immd0754/S_MELLOR/Rosa/neg_strand_annotations.bed") {
 #### List of regions of interest (for instance promoter proximal) based on reference genes/regions/genome
-
-regionlist <- function (plus, minus, pos_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/pos_strand_annotations.bed", neg_strand="//biochstore4.bioch.ox.ac.uk/Mellor/Rosa/neg_strand_annotations.bed") {
- 
-   #Standard is genes according to Steinmetz lab Pechano et al. 2013
+  ### Standard is genes according to Steinmetz lab Pechano et al. 2013
+  ### This is an older version that doesn't select genes of certain length
+  
+  
   genes_plus <-read.table(pos_strand)
   genes_minus <- read.table(neg_strand)
   
