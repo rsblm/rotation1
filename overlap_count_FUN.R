@@ -4,12 +4,11 @@ overlap_count <- function(promoter_region, bwfile, gene_array ) {
   # Bwfile is imported bigwigfile
   # gene_array is the array that has to be substituted
 
-
 ## get bwfile and trim it to the need of your gene
-b <- as.data.frame(test_bw2)
+b <- as.data.frame(test_bw)
 b2 <- b[(b$seqnames==as.character(promoter_region$V1[[i]])),] # Specify chr. Added as.character because otherwise you're comparing factors and they don't have the same levels (because the bigwig file has chrM and promoter_region not), but maybe this is not the best solution
 b3 <- b2[b2$end>promoter_region$V2[[i]],]
-b3 <- b3[b3$start<max(s),]
+b3 <- b3[b3$start<(promoter_region$V3[[i]]-1),]
 
 if(sum(b3$width)>=minus+plus){
   b3[1,2] <- promoter_region$V2[[i]]
