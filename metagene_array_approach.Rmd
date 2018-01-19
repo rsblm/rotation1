@@ -36,7 +36,7 @@ genes_minus <- res$genes_minus
 Data import
 ```{r}
 source("/home/immd0754/Documents/R_things/General R scripts/metagene/filelist_FUN.R")
-filesbw <- filelist("/home/immd0754/S_MELLOR/Rosa/cerevisiae_dataForRosa", "uzun", MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
+filesbw <- filelist("/home/immd0754/S_MELLOR/Rosa/cerevisiae_dataForRosa", "churchman", MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
 ``` 
 
 
@@ -46,28 +46,43 @@ filesbw <- filelist("/home/immd0754/S_MELLOR/Rosa/cerevisiae_dataForRosa", "uzun
 
 ```{r}
 source("/home/immd0754/Documents/R_things/General R scripts/metagene/bw_to_countmatrix_FUN.R")
-overview <- bw_to_countmatrix(filesbw, genes_minus, genes_plus, plus, minus, MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
+overview_sum <- bw_to_countmatrix(filesbw, genes_minus, genes_plus, plus, minus, MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
 
-###Reverse rownames of negative strands: WORKS ONLY AS LONG AS genes_minus is first half, otherwise you have to change this bit
-source("/home/immd0754/Documents/R_things/General R scripts/metagene/revneg_array_FUN.R")
-overview_rev <- revneg(overview, genes_minus)
+overview <- overview_sum$overview_exl
+sum_exl_read_dens <- overview_sum$sum_exl_read_dens
+
+
+###Reverse rows of negative strand, WORKS ONLY AS LONG AS genes_minus is first half, otherwise you have to change this bit
+source("/home/immd0754/Documents/R_things/General R scripts/metagene/rev_neg_array_FUN.R")
+overview_rev <- rev_neg_array(overview, genes_minus, sum_exl_read_dens)
 
 ## Normalisation
 source("/home/immd0754/Documents/R_things/General R scripts/metagene/normalise_array_FUN.R")
 overview_rev_norm <- normalise_array(overview_rev, filesbw)
 
-source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_sum_withapply_FUN.R")
-m <- apply(overview_rev_norm, 3, colSums)
+#source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/bin_sum_withapply_FUN.R")
+m <- apply(overview_rev_norm, c(2,3), mean) # more or less same as below
+m2 <- apply(overview_rev_norm, 3, colSums) # more or less same as above
 
 
 ############ what has happened to genes that are overlapping. Multiple transcription start sites.
+m2 <- cbind(m, rep(1:(nrow(m)/3), each=3))
+m <- cbind(as.vector(by(m2[,1], INDICES=m2[,3], sum)), as.vector(by(m2[,2], INDICES=m2[,3], sum)))
+
+graph_samples(as.data.frame(m), plus=1000, minus=500, name="churchman", filesbw)
+
 
 ```
 
 
 ```{r}
-source("C:/Users/immd0754/Documents/R_things/General R scripts/metagene/graph_samples_fun.R")
-graph_samples(t(m), plus=1000, minus=500, numberbin, name="booth")
+source("/home/immd0754/Documents/R_things/General R scripts/metagene/graph_samples_FUN.R")
+graph_samples(as.data.frame(t(overview_rev[110:115,,2])), plus=1000, minus=500, name="churchman", filesbw)
+graph_samples(as.data.frame(t(overview_rev_norm[110:115,,2])), plus=1000, minus=500, name="churchman_norm", filesbw)
+graph_samples(as.data.frame(t(overview_rev[10:15,,2])), plus=1000, minus=500, name="churchman_norm", filesbw)
+graph_samples(as.data.frame(m), plus=1000, minus=500, name="churchman", filesbw)
+
+# to look at a few genes: t(overview[4010:4015,,2])
 ```
 
 
