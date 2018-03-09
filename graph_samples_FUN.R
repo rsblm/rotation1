@@ -12,7 +12,8 @@ graph_samples <- function(combined, minus, plus, name, filesbw){
   
   lp <- ggplot(cmcom, aes(bp, value, colour = variable)) + geom_line()
   lp2 <- lp + ggtitle(paste("Metageneplot from", name, "experiments", sep = " ")) + theme(plot.background = element_rect(fil="grey97"), panel.grid.major= element_line(colour = "grey80", size=0.001), panel.grid.minor= element_line(colour = "grey80", size=0.001), panel.background = element_rect(fill = "grey90"), legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(10, 0, 10, 0))) + scale_colour_tableau() + guides(colour = guide_legend(override.aes = list(size=1.5))) + xlab("Position to TSS (bp)") + ylab("Normalised Pol II occupancy")
-
+  #lp2 <- lp + ggtitle(paste("Metageneplot from", name, "experiments", sep = " ")) + coord_fixed(ratio=190000) + theme(plot.background = element_rect(fil="grey97"), panel.grid.major= element_line(colour = "grey80", size=0.001), panel.grid.minor= element_line(colour = "grey80", size=0.001), panel.background = element_rect(fill = "grey90"), legend.position = "right", legend.key=element_rect(fill=NA), legend.title=element_blank(), plot.title = element_text(size=15, face="bold", margin = margin(10, 0, 10, 0))) + scale_colour_tableau() + guides(colour = guide_legend(override.aes = list(size=1.5))) + xlab("Position to TSS (bp)") + ylab("Normalised Pol II occupancy(a.u.)")
+  
 
   return(lp2)
 }

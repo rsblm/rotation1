@@ -18,8 +18,6 @@ Constructing genomic intervals of interest
 ```{r}
 source("/home/immd0754/Documents/R_things/General R scripts/metagene/regionlist_length_yeast_FUN.R")
 res <- regionlist(plus=1000, minus=500, pos_strand="/home/immd0754/S_MELLOR/Rosa/pos_strand_annotations.bed", neg_strand="/home/immd0754/S_MELLOR/Rosa/neg_strand_annotations.bed")
-
-
 promoter_region <- res$promoter_region
 genes_plus <- res$genes_plus
 genes_minus <- res$genes_minus
@@ -36,7 +34,7 @@ genes_minus <- res$genes_minus
 Data import
 ```{r}
 source("/home/immd0754/Documents/R_things/General R scripts/metagene/filelist_FUN.R")
-filesbw <- filelist("/home/immd0754/S_MELLOR/Rosa/cerevisiae_dataForRosa", "churchman", MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
+filesbw <- filelist("/home/immd0754/S_MELLOR/Rosa/cerevisiae_dataForRosa", "uzun", MinPlus_ann=c("plus|posstrand|unipos","minus|negstrand|unimin"))
 ``` 
 
 
